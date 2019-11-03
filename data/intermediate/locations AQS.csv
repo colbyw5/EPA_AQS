@@ -1,0 +1,36 @@
+city,state,location_lat,location_lon,state_FIPS,county_FIPS,site_number,Latitude,Longitude,Address,site_zip,site_state,site_county,site_city
+Chicago,IL,41.8373,-87.6862,17,031,42,41.87898,-87.635556,WACKER AT ADAMS,60606,Illinois,Cook,Chicago
+Chicago,IL,41.8373,-87.6862,17,031,57,41.912739,-87.722673,1745 N. SPRINGFIELD,60647,Illinois,Cook,Chicago
+Chicago,IL,41.8373,-87.6862,17,031,72,41.895812,-87.607683,1000 E. OHIO,60611,Illinois,Cook,Chicago
+Chicago,IL,41.8373,-87.6862,17,031,76,41.7514,-87.713488,7801 LAWNDALE,60652,Illinois,Cook,Chicago
+Chicago,IL,41.8373,-87.6862,17,031,110,41.85577,-87.657928,1241 19th St.,60608,Illinois,Cook,Chicago
+Chicago,IL,41.8373,-87.6862,17,031,4002,41.855243,-87.75247,1820 S. 51ST AVE.,60804,Illinois,Cook,Cicero
+Chicago,IL,41.8373,-87.6862,17,031,5501,41.92271,-87.6632,2245 N Southport Ave # 1,60614,Illinois,Cook,Chicago
+Chicago,IL,41.8373,-87.6862,17,031,6005,41.864426,-87.748902,13TH ST. & 50TH AVE.,60804,Illinois,Cook,Cicero
+Miami,FL,25.7839,-80.2102,12,086,20,25.808709,-80.301995,7100 NW 36TH ST.,NA,Florida,Miami-Dade,Miami
+Miami,FL,25.7839,-80.2102,12,086,27,25.732878,-80.16175,"4600 Rickenbacker Causeway, Miami, FL 33149",33149,Florida,Miami-Dade,Miami
+Miami,FL,25.7839,-80.2102,12,086,35,25.785472,-80.284206,5600 Perimeter Road,33126,Florida,Miami-Dade,Miami
+Miami,FL,25.7839,-80.2102,12,086,1016,25.794222,-80.215556,"1200 NW 20th St, Miami, FL 33142",33142,Florida,Miami-Dade,Miami
+Miami,FL,25.7839,-80.2102,12,086,4002,25.798709,-80.210048,"864 NW 3rd Street, Miami, FL 33127",33127,Florida,Miami-Dade,Miami
+Houston,TX,29.7869,-95.3905,48,201,60,29.807415,-95.293622,5565 Kirkpatrick,77028,Texas,Harris,Houston
+Houston,TX,29.7869,-95.3905,48,201,67,29.722174,-95.462719,"4951 LEHIGH  BELLAIRE, TX",NA,Texas,Harris,Bellaire
+Houston,TX,29.7869,-95.3905,48,201,1052,29.81453,-95.38769,822 North Loop,77022,Texas,Harris,Houston
+Houston,TX,29.7869,-95.3905,48,201,5505,29.75273,-95.37244,1809 Louisiana St,77002,Texas,Harris,Houston
+Boston,MA,42.3188,-71.0846,25,025,2,42.348873,-71.097163,KENMORE SQ,2215,Massachusetts,Suffolk,Boston
+Boston,MA,42.3188,-71.0846,25,025,27,42.372122,-71.061741,ONE CITY SQ,2129,Massachusetts,Suffolk,Boston
+Boston,MA,42.3188,-71.0846,25,025,42,42.3295,-71.0826,HARRISON AVE,2119,Massachusetts,Suffolk,Boston
+Boston,MA,42.3188,-71.0846,25,025,44,42.325186,-71.056061,19 VON HILLERN ST,2125,Massachusetts,Suffolk,Boston
+Seattle,WA,47.6211,-122.3244,53,033,30,47.597222,-122.319722,10th & Weller,98104,Washington,King,Seattle
+Seattle,WA,47.6211,-122.3244,53,033,34,47.600833,-122.314444,1301 Yesler Way,98144,Washington,King,Seattle
+Seattle,WA,47.6211,-122.3244,53,033,35,47.599444,-122.326111,602 S Jackson St,98144,Washington,King,Seattle
+Seattle,WA,47.6211,-122.3244,53,033,52,47.6017,-122.3225,600 Yesler Way,98104,Washington,King,Seattle
+Seattle,WA,47.6211,-122.3244,53,033,53,47.6003,-122.32470000000001,620 S Main St,98104,Washington,King,Seattle
+Seattle,WA,47.6211,-122.3244,53,033,54,47.5989,-122.3222,418 8th  Ave S,98104,Washington,King,Seattle
+Seattle,WA,47.6211,-122.3244,53,033,55,47.5983,-122.3283,401 S Jackson St,98104,Washington,King,Seattle
+Seattle,WA,47.6211,-122.3244,53,033,56,47.5964,-122.3219,606 Maynard Ave S #101,98104,Washington,King,Seattle
+Seattle,WA,47.6211,-122.3244,53,033,57,47.55975,-122.338265,4700 East Marginal Way South,98134,Washington,King,Seattle
+Seattle,WA,47.6211,-122.3244,53,033,67,47.5986,-122.3165,"1212 S King Street, Seattle, WA 98144",98144,Washington,King,Seattle
+Seattle,WA,47.6211,-122.3244,53,033,80,47.568236,-122.308628,4103 BEACON HILL S,98108,Washington,King,Seattle
+Seattle,WA,47.6211,-122.3244,53,033,85,47.650932,-122.308181,U OF W PUMP BLDG/1960 NE PACIFIC AVE,NA,Washington,King,Seattle
+Seattle,WA,47.6211,-122.3244,53,033,1011,47.53091,-122.3208,8201 10TH AVENUE SOUTH,98108,Washington,King,Seattle
+Seattle,WA,47.6211,-122.3244,53,033,5502,47.52373,-122.325,723 S Concord St,98108,Washington,King,Seattle

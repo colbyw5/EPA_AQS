@@ -1,0 +1,50 @@
+---
+title: "EPA AQS Data Curation"
+author: "Colby Wilkinson"
+date: "10/31/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+Loading dataset of locations for which we need data: the top 20 cites by population.  Attributes include city, state, fips code, lat/long
+
+```{r}
+locations <- read_csv("../../data/locations/locations.csv") %>% 
+  mutate(state_FIPS = str_pad(state_FIPS, width = 2, side = "left", pad = "0"),
+         county_FIPS = str_pad(county_FIPS, width = 3, side = "left", pad = "0"))
+```
+
+Loading AQS Site information made available by the EPA: https://aqs.epa.gov/aqsweb/airdata/download_files.html 
+
+```{r}
+aqs_sites <- read_csv("../../data/locations/aqs_sites.csv") %>% 
+  rename(state_FIPS = 'State Code',
+         county_FIPS = 'County Code') %>% 
+  mutate(state_FIPS = str_pad(state_FIPS, width = 2, side = "left", pad = "0"),
+         county_FIPS = str_pad(county_FIPS, width = 3, side = "left", pad = "0")) %>% 
+  filter(as.numeric(str_sub(`Site Closed Date`, start = -2, end = -1)) > 99 | is.na(`Site Closed Date`)) %>% 
+  select(-c(`Site Closed Date`, 'Site Established Date'))
+```
+
+AQS sites are matched to locations by state, after adding FIPS state code to each station.  Sites are selected by proximity (using squared difference between location and site lat/long) and length of data collection history.  Using google maps we found lat/long squared distance of less than 0.1 reflected a reasonable distance between site and locaitons (<10 miles).  We then wrote the data to a csv file.
+
+```{r}
+locations %>%
+  select(-county_FIPS) %>% 
+  left_join(aqs_sites, by = "state_FIPS") %>% 
+  mutate(lat_lon_dist = sqrt((location_lat - Latitude)^2 + (location_lon - Longitude)^2)) %>% 
+  filter(lat_lon_dist < 0.1) %>% 
+  distinct() %>% 
+  select(-lat_lon_dist) %>% 
+  rename(site_city = `City Name`,
+         site_county =`County Name`,
+         site_state = `State Name`,
+         site_number = `Site Number`,
+         site_zip = `Zip Code`) %>% 
+  write_csv("../../data/intermediate/locations AQS.csv")
+
+```

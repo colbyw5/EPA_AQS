@@ -1,0 +1,7 @@
+city,state,location_lat,location_lon,state_FIPS,county_FIPS
+Los Angeles,CA,34.1139,-118.4068,60,37
+Chicago,IL,41.8373,-87.6862,17,31
+Miami,FL,25.7839,-80.2102,12,86
+Houston,TX,29.7869,-95.3905,48,201
+Boston,MA,42.3188,-71.0846,25,25
+Seattle,WA,47.6211,-122.3244,53,33

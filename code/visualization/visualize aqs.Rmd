@@ -1,0 +1,31 @@
+---
+title: "visualize aqs"
+author: "Colby Wilkinson"
+date: "11/1/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(lubridate)
+```
+
+Reading in data
+
+```{r}
+aqs_data <- data.table::fread("../../data/final/AQS HOURLY.csv")
+```
+
+Plot of CO over the base 20 years, by City
+
+```{r}
+aqs_data %>% 
+  mutate(date = ymd_hm(paste(date, hour, sep = " "))) %>% 
+  ggplot(aes(x = date, y = CO)) +
+  geom_point() +
+  facet_wrap(~city) +
+  ggsave("../../plots/CO_by_city.jpeg", width = 8, height = 5, units = "in", dpi = 200)
+
+```
+

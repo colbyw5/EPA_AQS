@@ -1,0 +1,195 @@
+---
+title: "EPA AQS Data Curation"
+author: "Colby Wilkinson"
+date: "10/31/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+Loading dataset of locations for which we need data: the top 20 cites by population.  Attributes include city, fips code, zip code, lat/long
+
+```{r}
+locations <- read_csv("../locations/locations.csv") %>% 
+  mutate(state_FIPS = str_pad(state_FIPS, width = 2, side = "left", pad = "0"),
+         county_FIPS = str_pad(county_FIPS, width = 3, side = "left", pad = "0"),
+         zip_code = str_pad(zip_code, 5, "0", side = "left"))
+```
+
+Loading AQS Site information made available by the EPA: https://aqs.epa.gov/aqsweb/airdata/download_files.html 
+
+```{r}
+aqs_sites <- read_csv("../locations/aqs_sites.csv") %>% 
+  rename(state_FIPS = 'State Code',
+         county_FIPS = 'County Code') %>% 
+  mutate(state_FIPS = str_pad(state_FIPS, width = 2, side = "left", pad = "0"),
+         county_FIPS = str_pad(county_FIPS, width = 3, side = "left", pad = "0")) %>% 
+  filter(as.numeric(str_sub(`Site Closed Date`, start = -2, end = -1)) > 99 | is.na(`Site Closed Date`)) %>% 
+  select(-c(`Site Closed Date`, 'Site Established Date'))
+```
+
+AQS sites are matched to locations by state, after adding FIPS state code to each station.  Sites are selected by proximity (using squared difference between location and site lat/long) and length of data collection history.  Using google maps we found lat/long squared distance of less than 0.1 reflected a reasonable distance between site and locaitons (<10 miles).  We then wrote the data to a csv file.
+
+```{r}
+locations %>%
+  select(-county_FIPS) %>% 
+  left_join(aqs_sites, by = "state_FIPS") %>% 
+  mutate(lat_lon_dist = sqrt((location_lat - Latitude)^2 + (location_lon - Longitude)^2)) %>% 
+  filter(lat_lon_dist < 0.10) %>% 
+  distinct() %>% 
+  select(-lat_lon_dist) %>% 
+  rename(site_city = `City Name`,
+         site_county =`County Name`,
+         site_state = `State Name`,
+         site_number = `Site Number`,
+         site_zip = `Zip Code`) %>% 
+  write_csv("../locations/locations AQS.csv")
+
+```
+
+Setting up collection: reading in the site information for which we will be collecting data
+
+```{r}
+aqs_fips_codes <- read_csv("../locations/locations AQS.csv") %>% 
+  distinct(state_FIPS, county_FIPS) %>% 
+  mutate(state_FIPS = str_pad(state_FIPS, side = "left", width = 2, pad = "0"),
+         county_FIPS = str_pad(county_FIPS, side = "left", width = 3, pad = "0"),
+         FIPS_code = paste(state_FIPS, county_FIPS, sep = ""))
+```
+
+Parameters: 
+
+* PM2.5 (Micrograms/cubic meter): 88101 and 88502
+* Carbon monoxide (CO) (ppm): 42101
+* Ozone (O3) (ppm): (44201) 
+
+Setting up directory for temporary data storage, initializing vectors of site FIPS codes, parameter codes and paramter names (used in file naming on the EPA website) and a list to store resulting datasets
+
+```{r}
+dir.create("./aqs_data")
+
+FIPS_codes <- aqs_fips_codes$FIPS_code
+
+parameter_codes <- c("88101", "88502", "42101", "44201")
+
+parameters_epa <- c("44201", "42101", "88101", "88502")
+
+aqs_data_list <- list()
+```
+
+The funciton below returns the AQS dataset given a parameter, year, fips code.
+
+```{r}
+
+getAQS <- function(parameter, year, FIPS_codes, parameter_codes, save_file = FALSE){
+  
+  # downloading data file from https://aqs.epa.gov
+  
+  file_link <- paste("https://aqs.epa.gov/aqsweb/airdata/hourly_", parameter, "_", year, ".zip", sep = "")
+
+  download.file(file_link, destfile = paste("./aqs_data/hourly_", parameter, "_", year, ".zip", sep = ""), method = "libcurl")
+  
+  zip_file <- paste("./aqs_data/hourly_", parameter, "_", year, ".zip", sep = "")
+  
+  out_dir <-"./aqs_data"
+  
+  unzip(zip_file,exdir = out_dir)
+  
+  # creating data set
+  
+  aqs_data <- data.table::fread(Sys.glob(paste("./aqs_data/?ourly_", parameter, "_", year, ".csv", sep = "")), data.table = FALSE) %>% 
+    rename(state_FIPS = `State Code`,
+           county_FIPS = `County Code`,
+           site_num = `Site Num`,
+           parameter = `Parameter Code`,
+           date = `Date GMT`,
+           hour = `Time GMT`,
+           value = `Sample Measurement`) %>%
+    mutate(state_FIPS = str_pad(state_FIPS, 2, "0", side = "left"),
+           county_FIPS = str_pad(county_FIPS, 3, "0", side = "left"),
+           FIPS_code = paste(state_FIPS, county_FIPS, sep = ""),
+           value = as.numeric(value)) %>%
+    filter(FIPS_code %in% FIPS_codes) %>% 
+    select(state_FIPS, county_FIPS, site_num, parameter, date, hour, value) %>%
+    filter(!is.na(value) & parameter %in% parameter_codes) %>%
+    group_by(state_FIPS, county_FIPS, parameter, date, hour, site_num) %>% 
+    summarise(value = round(mean(value, na.rm = TRUE), digits = 3)) %>% 
+    ungroup() %>% 
+    mutate_all(as.character) %>% 
+    mutate(parameter = ifelse(parameter == "88101", "pm25", parameter),
+           parameter = ifelse(parameter == "88502", "pm25_local", parameter),
+           parameter = ifelse(parameter == "42101", "CO", parameter),
+           parameter = ifelse(parameter == "44201", "ozone", parameter))
+  
+              
+  # saving file to data directory
+              
+  if (save_file){
+    unlink("./aqs_data/*.zip")
+  }else{
+    unlink("./aqs_data/*")
+  }
+  
+  # close file connections
+  closeAllConnections()
+  
+  return(aqs_data)
+}
+
+
+```
+
+Looping over years 1999-2019, adding resulting dataset to previously initialized list
+
+```{r, error=FALSE, message=FALSE, warning=FALSE, results="hide"}
+for (year in 1999:2019){
+  
+  for (parameter in parameters_epa){
+    
+    aqs_data_list[[paste(year, parameter, sep = "_")]] <- getAQS(parameter = parameter,
+                                                                 year = year,
+                                                                 FIPS_codes = FIPS_codes,
+                                                                 parameter_codes = parameter_codes)
+  }
+}
+```
+
+Binding the resulting data frames, removing duplicate rows, reshaping and saving to a csv file
+
+```{r}
+aqs_data <- bind_rows(aqs_data_list) %>%
+  filter(parameter %in% c("PM2.5", "PM2.5_local", "CO", "ozone")) %>%
+  group_by(state_FIPS, county_FIPS, date, hour, parameter, site_num) %>%
+  filter(row_number()==1) %>% 
+  mutate(value = as.numeric(value)) %>%
+  ungroup() %>%
+  spread(key = parameter, value = value)
+```
+
+Adding AQS data to locations: matching based on AQS sites, cleaning variables and saving to a csv
+
+```{r}
+fread("../locations/locations AQS.csv") %>% 
+  mutate(state_FIPS = str_pad(state_FIPS, side = "left", width = 2, pad = "0"),
+         county_FIPS = str_pad(county_FIPS, side = "left", width = 3, pad = "0")) %>% 
+  left_join(aqs_data %>% 
+              separate(date_gmt, into = c("year", "month", "day"), sep = "-") %>%
+              mutate(state_FIPS = str_pad(state_FIPS, side = "left", width = 2, pad = "0"),
+                     county_FIPS = str_pad(county_FIPS, side = "left", width = 3, pad = "0")) %>% 
+              mutate(pm25 = ifelse(pm25 < -10 | pm25 > 501, NA, pm25),
+                     pm25_local = ifelse(pm25_local < -10 | pm25_local > 501, NA, pm25_local),
+                     carbon_monoxide = ifelse(carbon_monoxide < 0 | carbon_monoxide > 70, NA, carbon_monoxide),
+                     ozone = ifelse(ozone < 0 | ozone > 1, NA, ozone)),
+            by = c("state_FIPS", "county_FIPS", "site_number")) %>%
+  group_by(city, state, year, month, day, hour) %>% 
+  summarise(pm25 = round(mean(pm25, na.rm = TRUE), digits = 3),
+            pm25_local = round(mean(pm25_local, na.rm = TRUE), digits = 3),
+            ozone = round(mean(ozone, na.rm = TRUE), digits = 3),
+            carbon_monoxide = round(mean(carbon_monoxide, na.rm = TRUE), digits = 3)) %>% 
+  ungroup() %>% 
+  head()
+  write_csv("./data/AQS HOURLY.csv")
+```
