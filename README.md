@@ -1,4 +1,4 @@
-###Data Visualizations of Environmental Protection Agency (EPA) Air Quality System (AQS)  
+### Data Visualizations of Environmental Protection Agency (EPA) Air Quality System (AQS)  
 
 Purpose: The purpose of this repository is to implement a variety of data visualizations using historical EPA air quality data. The EPA Data includes air quality measures such as PM2.5, Ozone, and Carbon Monoxide in major cities (Boston, NYC, etc.) from 1990-2019.
 
