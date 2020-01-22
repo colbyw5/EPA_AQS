@@ -13,4 +13,6 @@ From the EPA's website: The Air Quality System (AQS) contains ambient air pollut
 Language: R Version 3.5.3
 
 Key Packages:
+- dplyr==0.8.3
+- ggplot==3.2.1
   
