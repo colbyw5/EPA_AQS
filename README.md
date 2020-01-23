@@ -10,6 +10,8 @@ From the EPA's website: The Air Quality System (AQS) contains ambient air pollut
 - perform modeling for permit review analysis
 - prepare reports for Congress as mandated by the Clean Air Act
 
+![PM 2.5 by Major City 2010-2019](https://github.com/colbyw5/EPA_Visualizations/blob/master/plots/pm25_by_city.jpeg)
+
 Language: R Version 3.5.3
 
 Key Packages:
