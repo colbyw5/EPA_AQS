@@ -17,15 +17,24 @@ Reading in data
 aqs_data <- data.table::fread("../../data/final/AQS HOURLY.csv")
 ```
 
-Plot of CO over the base 20 years, by City
+Plot of pm 2.5 over the base 10 years, by City
 
-```{r}
+```{r, dpi=150, fig.height=10, fig.width=7.5}
 aqs_data %>% 
   mutate(date = ymd_hm(paste(date, hour, sep = " "))) %>% 
-  ggplot(aes(x = date, y = CO)) +
-  geom_point() +
-  facet_wrap(~city) +
-  ggsave("../../plots/CO_by_city.jpeg", width = 8, height = 5, units = "in", dpi = 200)
+  filter(date > date('2010-01-01')) %>% 
+  filter(city != "Houston") %>% 
+  ggplot(aes(x = date, y = pm25_local)) +
+  geom_point(color = 'darkcyan', alpha = 0.6) +
+  geom_smooth(color = 'firebrick2') +
+  facet_wrap(~city, nrow = 5) +
+  theme(axis.text = element_text(size = 7)) +
+  theme(strip.text = element_text(size = 8)) +
+  theme(axis.title = element_text(size = 7)) +
+  ylab("PM 2.5 (Micrograms/cubic meter)") +
+  xlab("") +
+  theme(axis.text.x=element_text(angle=60, hjust=1)) +
+  ggsave("../../plots/pm25_by_city.jpeg")
 
 ```
 
