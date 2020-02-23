@@ -38,4 +38,44 @@ aqs_data %>%
 
 ```
 
-Ozone levels in previous 5 years
+Ozone levels in previous 10 years
+
+```{r}
+aqs_data %>% 
+  mutate(date = ymd_hm(paste(date, hour, sep = " "))) %>% 
+  filter(date > date('2010-01-01')) %>% 
+  filter(city != "Houston") %>% 
+  mutate(year = year(date)) %>% 
+  group_by(year, city) %>% 
+  summarise(ozone = mean(ozone, na.rm = TRUE)) %>% 
+  ggplot(aes(x = year, y = ozone, col = city)) +
+  geom_line() +
+  geom_point() +
+  xlab("Year") +
+  ylab("Average Ozone (ppm)") +
+  ggtitle("Average Annual Ozone (ppm) by City") +
+  theme(plot.title = element_text(hjust = 0.5, size = 14)) + 
+  scale_colour_discrete(name = "") +
+  scale_x_continuous(breaks = 2010:2019)
+```
+
+Carbon Monoxide levels in previous 5 years
+
+```{r}
+aqs_data %>% 
+  mutate(date = ymd_hm(paste(date, hour, sep = " "))) %>% 
+  filter(date > date('2014-01-01')) %>% 
+  filter(city != "Chicago") %>% 
+  mutate(year = year(date)) %>% 
+  group_by(year, city) %>% 
+  summarise(ozone = mean(CO, na.rm = TRUE)) %>% 
+  ggplot(aes(x = year, y = ozone, col = city)) +
+  geom_line() +
+  geom_point() +
+  xlab("Year") +
+  ylab("Average CO (ppm)") +
+  ggtitle("Average Annual Carbon Monoxide Level (ppm) by City") +
+  theme(plot.title = element_text(hjust = 0.5, size = 14)) + 
+  scale_colour_discrete(name = "") +
+  scale_x_continuous(breaks = 2010:2019)
+```
